@@ -1,0 +1,102 @@
+﻿using FluentValidation;
+using System.Linq.Expressions;
+using PageConstructor.Infrastructure.Metas.Validators;
+using PageConstructor.Persistence.Repositories.Interfaces;
+using PageConstructor.Application.Metas.Services;
+using PageConstructor.Domain.Entities;
+using PageConstructor.Domain.Common.Queries;
+using PageConstructor.Application.Metas.Models;
+using PageConstructor.Persistence.Extensions;
+using PageConstructor.Domain.Common.Commands;
+using PageConstructor.Domain.Enums;
+
+namespace PageConstructor.Infrastructure.Metas.Services;
+
+public class MetaService(
+    IMetaRepository metaRepository,
+    MetaValidator validator)
+   : IMetaService
+{
+    public IQueryable<Meta> Get(
+        Expression<Func<Meta, bool>>? predicate = null,
+        QueryOptions queryOptions = default) =>
+    metaRepository.Get(predicate, queryOptions);
+
+    public IQueryable<Meta> Get(
+        MetaFilter answerFilter,
+        QueryOptions queryOptions = default) =>
+    metaRepository
+        .Get(queryOptions: queryOptions)
+        .ApplyPagination(answerFilter);
+
+    public ValueTask<Meta?> GetByIdAsync(
+        Guid id,
+        QueryOptions queryOptions = default,
+        CancellationToken cancellationToken = default) =>
+    metaRepository.GetByIdAsync(id, queryOptions, cancellationToken);
+
+    public ValueTask<IList<Meta>> GetByIdsAsync(
+        IEnumerable<Guid> ids,
+        QueryOptions queryOptions = default,
+        CancellationToken cancellationToken = default) =>
+    metaRepository.GetByIdsAsync(ids, queryOptions, cancellationToken);
+
+    public ValueTask<bool> CheckByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default) =>
+    metaRepository.CheckByIdAsync(id, cancellationToken);
+
+    public async ValueTask<Meta> CreateAsync(
+        Meta meta,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default)
+    {
+        var validationResult = await validator.ValidateAsync(
+            meta,
+            options => options
+            .IncludeRuleSets(EntityEvent.OnCreate.ToString()),
+            cancellationToken);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
+        return await metaRepository.CreateAsync(meta, commandOptions, cancellationToken);
+    }
+
+    public async ValueTask<Meta> UpdateAsync(
+        Meta meta,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default)
+    {
+        var validationResult = await validator.ValidateAsync(
+            meta,
+            options => options
+            .IncludeRuleSets(EntityEvent.OnUpdate.ToString()),
+            cancellationToken);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
+        var existingMeta = await metaRepository.GetByIdAsync(meta.Id) ?? throw new ArgumentNullException("This book doesn't exist");
+
+        existingMeta.Title = meta.Title;
+        existingMeta.Description = meta.Description;
+        existingMeta.PageId = meta.PageId;
+        existingMeta.OgDescription = meta.OgDescription;
+        existingMeta.OgTitle = meta.OgTitle;
+
+        return await metaRepository.UpdateAsync(existingMeta, commandOptions, cancellationToken);
+    }
+
+    public ValueTask<Meta?> DeleteAsync(
+        Meta meta,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default) =>
+    metaRepository.DeleteAsync(meta, commandOptions, cancellationToken);
+
+    public ValueTask<Meta?> DeleteByIdAsync(
+        Guid id,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default) =>
+    metaRepository.DeleteByIdAsync(id, commandOptions, cancellationToken);
+}
