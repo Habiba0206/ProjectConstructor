@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PageConstructor.Persistence.Caching.Models;
 using PageConstructor.Persistence.Caching.Brokers;
 using PageConstructor.Persistence.Extensions;
-using PageConstructor.Domain.Entities;
+using PageConstructor.Domain.Common.Exceptions;
 
 namespace PageConstructor.Persistence.Repositories;
 
@@ -93,7 +93,9 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
         else
             foundEntity = cachedEntity;
 
-        return foundEntity.IsDeleted ? throw new ArgumentException("Entity deleted") : foundEntity;
+        _= foundEntity ?? throw new NotFoundException(typeof(TEntity).Name, id);
+
+        return foundEntity.IsDeleted ? throw new EntityDeletedException(typeof(TEntity).Name, foundEntity.Id) : foundEntity;
     }
 
     /// <summary>
@@ -204,6 +206,10 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
+        var foundEntity = await GetByIdAsync(entity.Id);
+
+        _ = foundEntity ?? throw new NotFoundException(typeof(TEntity).Name, entity.Id);
+
         entity.IsDeleted = true;
 
         DbContext.Set<TEntity>().Update(entity);
@@ -233,7 +239,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
         var entity = await DbContext
             .Set<TEntity>()
             .FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken)
-            ?? throw new InvalidOperationException();
+            ?? throw new NotFoundException(typeof(TEntity).Name, id);
 
         entity.IsDeleted = true;
 

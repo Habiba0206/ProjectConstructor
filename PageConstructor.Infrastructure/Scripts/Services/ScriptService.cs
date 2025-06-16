@@ -46,37 +46,17 @@ public class ScriptService(
         CancellationToken cancellationToken = default) =>
     scriptRepository.CheckByIdAsync(id, cancellationToken);
 
-    public async ValueTask<Script> CreateAsync(
+    public ValueTask<Script> CreateAsync(
         Script script,
         CommandOptions commandOptions = default,
-        CancellationToken cancellationToken = default)
-    {
-        var validationResult = await validator.ValidateAsync(
-            script,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnCreate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
-        return await scriptRepository.CreateAsync(script, commandOptions, cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+    scriptRepository.CreateAsync(script, commandOptions, cancellationToken);
 
     public async ValueTask<Script> UpdateAsync(
         Script script,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await validator.ValidateAsync(
-            script,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnUpdate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
         var existingScript = await scriptRepository.GetByIdAsync(script.Id) ?? throw new ArgumentNullException("This book doesn't exist");
 
         existingScript.Type = script.Type;

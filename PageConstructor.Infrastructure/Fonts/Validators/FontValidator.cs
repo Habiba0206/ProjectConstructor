@@ -1,14 +1,13 @@
-﻿using PageConstructor.Domain.Entities;
-using PageConstructor.Domain.Enums;
-using FluentValidation;
+﻿using FluentValidation;
+using PageConstructor.Application.Fonts.Models;
 
 namespace PageConstructor.Infrastructure.Fonts.Validators;
-public class FontValidator : AbstractValidator<Font>
+public class FontValidator : AbstractValidator<FontDto>
 {
     public FontValidator()
     {
-        RuleFor(font => font.Name).NotEmpty();
-        RuleFor(font => font.Src).NotEmpty();
-        RuleFor(font => font.Display).NotEmpty();
+        RuleFor(font => font.Name).NotEmpty().WithMessage("Name can't be empty.");
+        RuleFor(font => font.Src).NotEmpty().WithMessage("Src can't be empty.");
+        RuleFor(font => font.Display).NotEmpty().WithMessage("Display can't be empty.");
     }
 }

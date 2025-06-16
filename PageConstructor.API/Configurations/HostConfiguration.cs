@@ -8,11 +8,11 @@ public static partial class HostConfiguration
             .AddSerializers()
             .AddMappers()
             .AddValidators()
+            .AddMediatR()
             .AddCaching()
             .AddEventBus()
             .AddPersistence()
             .AddInfrastructure()
-            .AddMediatR()
             .AddCors()
             .AddDevTools()
             .AddExposers();

@@ -46,37 +46,17 @@ public class FontService(
         CancellationToken cancellationToken = default) =>
     fontRepository.CheckByIdAsync(id, cancellationToken);
 
-    public async ValueTask<Font> CreateAsync(
+    public ValueTask<Font> CreateAsync(
         Font font,
         CommandOptions commandOptions = default,
-        CancellationToken cancellationToken = default)
-    {
-        var validationResult = await validator.ValidateAsync(
-            font,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnCreate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
-        return await fontRepository.CreateAsync(font, commandOptions, cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+    fontRepository.CreateAsync(font, commandOptions, cancellationToken);
 
     public async ValueTask<Font> UpdateAsync(
         Font font,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await validator.ValidateAsync(
-            font,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnUpdate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
         var existingFont = await fontRepository.GetByIdAsync(font.Id) ?? throw new ArgumentNullException("This book doesn't exist");
 
         existingFont.Name = font.Name;

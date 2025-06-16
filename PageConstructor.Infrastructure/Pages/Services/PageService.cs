@@ -13,8 +13,7 @@ using PageConstructor.Domain.Enums;
 namespace PageConstructor.Infrastructure.Pages.Services;
 
 public class PageService(
-    IPageRepository pageRepository,
-    PageValidator validator)
+    IPageRepository pageRepository)
    : IPageService
 {
     public IQueryable<Page> Get(
@@ -49,34 +48,14 @@ public class PageService(
     public async ValueTask<Page> CreateAsync(
         Page page,
         CommandOptions commandOptions = default,
-        CancellationToken cancellationToken = default)
-    {
-        var validationResult = await validator.ValidateAsync(
-            page,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnCreate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
-        return await pageRepository.CreateAsync(page, commandOptions, cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+    await pageRepository.CreateAsync(page, commandOptions, cancellationToken);
 
     public async ValueTask<Page> UpdateAsync(
         Page page,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await validator.ValidateAsync(
-            page,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnUpdate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
         var existingPage = await pageRepository.GetByIdAsync(page.Id) ?? throw new ArgumentNullException("This book doesn't exist");
 
         existingPage.ProjectId = page.ProjectId;

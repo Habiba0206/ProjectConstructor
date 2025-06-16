@@ -9,7 +9,7 @@ public class PageConfiguration : IEntityTypeConfiguration<Page>
     public void Configure(EntityTypeBuilder<Page> builder)
     {
         builder.HasKey(p => p.Id);
-
+        
         builder.Property(p => p.Title).IsRequired().HasMaxLength(255);
         builder.Property(p => p.Css).HasColumnType("text");
         

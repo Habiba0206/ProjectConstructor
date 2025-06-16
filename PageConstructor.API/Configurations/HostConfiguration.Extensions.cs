@@ -25,6 +25,10 @@ using PageConstructor.Infrastructure.Fonts.Services;
 using PageConstructor.Infrastructure.Metas.Services;
 using PageConstructor.Infrastructure.Pages.Services;
 using PageConstructor.Infrastructure.Scripts.Services;
+using Microsoft.OpenApi.Models;
+using PageConstructor.API.Middlewares;
+using MediatR;
+using PageConstructor.API.Behaviours;
 
 namespace PageConstructor.API.Configurations;
 
@@ -147,6 +151,8 @@ public static partial class HostConfiguration
             .Services
             .AddMediatR(conf => { conf.RegisterServicesFromAssemblies(Assemblies.ToArray()); });
 
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
         return builder;
     }
 
@@ -173,7 +179,18 @@ public static partial class HostConfiguration
     private static WebApplicationBuilder AddDevTools(this WebApplicationBuilder builder)
     {
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
+
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Page Constructor API",
+                Version = "v1"
+            });
+        });
 
         return builder;
     }
@@ -184,7 +201,7 @@ public static partial class HostConfiguration
             (options => { options.SuppressModelStateInvalidFilter = true; });
 
         builder.Services.AddRouting(options => options.LowercaseUrls = true);
-        builder.Services.AddControllers().AddNewtonsoftJson();
+        builder.Services.AddControllers();
 
         return builder;
     }
@@ -200,6 +217,7 @@ public static partial class HostConfiguration
 
     private static WebApplication UseDevTools(this WebApplication app)
     {
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
         app.UseSwagger();
         app.UseSwaggerUI();
 

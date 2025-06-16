@@ -46,37 +46,17 @@ public class MetaService(
         CancellationToken cancellationToken = default) =>
     metaRepository.CheckByIdAsync(id, cancellationToken);
 
-    public async ValueTask<Meta> CreateAsync(
+    public ValueTask<Meta> CreateAsync(
         Meta meta,
         CommandOptions commandOptions = default,
-        CancellationToken cancellationToken = default)
-    {
-        var validationResult = await validator.ValidateAsync(
-            meta,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnCreate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
-        return await metaRepository.CreateAsync(meta, commandOptions, cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+    metaRepository.CreateAsync(meta, commandOptions, cancellationToken);
 
     public async ValueTask<Meta> UpdateAsync(
         Meta meta,
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await validator.ValidateAsync(
-            meta,
-            options => options
-            .IncludeRuleSets(EntityEvent.OnUpdate.ToString()),
-            cancellationToken);
-
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
         var existingMeta = await metaRepository.GetByIdAsync(meta.Id) ?? throw new ArgumentNullException("This book doesn't exist");
 
         existingMeta.Title = meta.Title;

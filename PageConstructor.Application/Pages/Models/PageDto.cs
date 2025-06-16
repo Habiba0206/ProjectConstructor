@@ -8,7 +8,7 @@ namespace PageConstructor.Application.Pages.Models;
 public class PageDto
 {
     public Guid? Id { get; set; }
-    public Guid ProjectId { get; set; }
+    public Guid? ProjectId { get; set; }
     public string Title { get; set; }
     public string? Css { get; set; }
     public bool IsPublished { get; set; }
