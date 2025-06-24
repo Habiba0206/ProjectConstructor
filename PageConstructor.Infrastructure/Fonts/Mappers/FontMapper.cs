@@ -10,5 +10,7 @@ public class FontMapper : Profile
     {
         CreateMap<Font, FontDto>().ReverseMap();
         CreateMap<FontWeight, FontWeightDto>().ReverseMap();
+        CreateMap<Font, FontPatchDto>().ReverseMap();
+        CreateMap<FontWeight, FontWeightPatchDto>().ReverseMap();
     }
 }

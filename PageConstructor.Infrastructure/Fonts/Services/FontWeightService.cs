@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using PageConstructor.Infrastructure.Fonts.Validators;
 using PageConstructor.Persistence.Repositories.Interfaces;
 using PageConstructor.Application.Fonts.Services;
@@ -8,7 +7,7 @@ using PageConstructor.Domain.Common.Queries;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Persistence.Extensions;
 using PageConstructor.Domain.Common.Commands;
-using PageConstructor.Domain.Enums;
+using PageConstructor.Domain.Common.Exceptions;
 
 namespace PageConstructor.Infrastructure.Fonts.Services;
 
@@ -57,7 +56,27 @@ public class FontWeightService(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        return await fontWeightRepository.UpdateAsync(fontWeight, commandOptions, cancellationToken);
+        var existing = await fontWeightRepository.GetByIdAsync(fontWeight.Id, cancellationToken: cancellationToken)
+                      ?? throw new NotFoundException(typeof(FontWeight).Name, fontWeight.Id);
+
+        existing.Count = fontWeight.Count;
+        existing.FontId = fontWeight.FontId;
+
+        return await fontWeightRepository.UpdateAsync(existing, commandOptions,cancellationToken);
+    }
+
+    public async ValueTask<FontWeight> PatchAsync(
+        FontWeightPatchDto patchDto,
+        CommandOptions commandOptions = default, 
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await fontWeightRepository.GetByIdAsync(patchDto.Id, cancellationToken: cancellationToken)
+                      ?? throw new NotFoundException(typeof(FontWeight).Name, patchDto.Id);
+
+        if (patchDto.Count.HasValue) existing.Count = patchDto.Count.Value;
+        if (patchDto.FontId.HasValue) existing.FontId = patchDto.FontId.Value;
+
+        return await fontWeightRepository.UpdateAsync(existing, commandOptions,cancellationToken);
     }
 
     public ValueTask<FontWeight?> DeleteAsync(

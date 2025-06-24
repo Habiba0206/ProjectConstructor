@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using PageConstructor.API.Common;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Application.Pages.Models;
+using PageConstructor.Application.Pages.Commands;
 
 namespace PageConstructor.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class FontsController(IMediator mediator) : ControllerBase
 {
     /// <summary>
@@ -82,6 +84,23 @@ public class FontsController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(FontDto), StatusCodes.Status200OK)]
     public async ValueTask<IActionResult> UpdateFont([FromBody] FontUpdateCommand command, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Partially updates an existing font.
+    /// </summary>
+    /// <param name="command">The patch command containing updated fields.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated Font data.</returns>
+    /// <response code="200">Font patched successfully</response>
+    /// <response code="400">Invalid data in patch request</response>
+    [HttpPatch]
+    [ProducesResponseType(typeof(FontPatchDto), StatusCodes.Status200OK)]
+    public async ValueTask<IActionResult> Patch([FromBody] FontPatchCommand command, CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
 

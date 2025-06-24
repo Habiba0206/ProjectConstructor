@@ -4,11 +4,14 @@ namespace PageConstructor.Domain.Entities;
 
 public class Page : AuditableEntity
 {
-    public Guid ProjectId { get; set; }
     public string Title { get; set; }
+    public string UrlPath { get; set; }
     public string? Css { get; set; }
     public bool IsPublished { get; set; }
-
+    public DateTimeOffset LastSaved { get; set; }
+    public Guid ProjectId { get; set; }
+    public Project Project { get; set; }
+    public string? SectionsJson { get; set; }
     public IList<Meta> Metas { get; set; }
     public IList<Script> Scripts { get; set; }
     //public List<Style> Styles { get; set; }

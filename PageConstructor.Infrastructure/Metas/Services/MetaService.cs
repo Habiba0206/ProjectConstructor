@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using PageConstructor.Infrastructure.Metas.Validators;
 using PageConstructor.Persistence.Repositories.Interfaces;
 using PageConstructor.Application.Metas.Services;
@@ -8,7 +7,7 @@ using PageConstructor.Domain.Common.Queries;
 using PageConstructor.Application.Metas.Models;
 using PageConstructor.Persistence.Extensions;
 using PageConstructor.Domain.Common.Commands;
-using PageConstructor.Domain.Enums;
+using PageConstructor.Domain.Common.Exceptions;
 
 namespace PageConstructor.Infrastructure.Metas.Services;
 
@@ -57,7 +56,7 @@ public class MetaService(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var existingMeta = await metaRepository.GetByIdAsync(meta.Id) ?? throw new ArgumentNullException("This book doesn't exist");
+        var existingMeta = await metaRepository.GetByIdAsync(meta.Id) ?? throw new NotFoundException(typeof(Meta).Name, meta.Id);
 
         existingMeta.Title = meta.Title;
         existingMeta.Description = meta.Description;
@@ -66,6 +65,24 @@ public class MetaService(
         existingMeta.OgTitle = meta.OgTitle;
 
         return await metaRepository.UpdateAsync(existingMeta, commandOptions, cancellationToken);
+    }
+
+    public async ValueTask<Meta> PatchAsync(
+        MetaPatchDto patchDto, 
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await metaRepository.GetByIdAsync(patchDto.Id, cancellationToken: cancellationToken)
+                      ?? throw new NotFoundException(typeof(Meta).Name, patchDto.Id);
+
+        if (patchDto.Title is not null) existing.Title = patchDto.Title;
+        if (patchDto.Description is not null) existing.Description = patchDto.Description;
+        if (patchDto.OgTitle is not null) existing.OgTitle = patchDto.OgTitle;
+        if (patchDto.OgDescription is not null) existing.OgDescription = patchDto.OgDescription;
+        if (patchDto.Keywords is not null) existing.Keywords = patchDto.Keywords;
+        if (patchDto.PageId.HasValue) existing.PageId = patchDto.PageId.Value;
+
+        return await metaRepository.UpdateAsync(existing, commandOptions, cancellationToken);
     }
 
     public ValueTask<Meta?> DeleteAsync(

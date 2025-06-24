@@ -38,7 +38,7 @@ public class PagesController(IMediator mediator) : ControllerBase
     /// Returns <see cref="OkObjectResult"/> with the page details if found,  
     /// or <see cref="NotFoundResult"/> if the page does not exist.
     /// </returns>
-    [HttpGet("{pageId:guid}")]
+    [HttpGet("by-id/{pageId:guid}")]
     [ProducesResponseType(typeof(ApiResponse<PageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<IActionResult> GetById([FromRoute] Guid pageId, CancellationToken cancellationToken = default)
@@ -46,6 +46,22 @@ public class PagesController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new PageGetByIdQuery { PageId = pageId }, cancellationToken);
 
         return result is not null ? Ok(result) : NotFound();
+    }
+
+    /// <summary>
+    /// Retrieves a page by its project id.
+    /// </summary>
+    /// <param name="projectId">The unique identifier of the project to retrieve.</param>
+    /// <param name="cancellationToken">Optional token to cancel the operation.</param>
+    /// <returns>List of pages or no 204 No Content.</returns>
+    [HttpGet("by-project/{projectId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<List<PageDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async ValueTask<IActionResult> GetByProjectId([FromRoute] Guid projectId, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new PageGetByProjectIdQuery { ProjectId = projectId }, cancellationToken);
+
+        return result.Any() ? Ok(result) : NoContent();
     }
 
     /// <summary>
@@ -83,6 +99,23 @@ public class PagesController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(PageDto), StatusCodes.Status200OK)]
     public async ValueTask<IActionResult> Update([FromBody] PageUpdateCommand command, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Partially updates an existing page.
+    /// </summary>
+    /// <param name="command">The patch command containing updated fields.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated page data.</returns>
+    /// <response code="200">Page patched successfully</response>
+    /// <response code="400">Invalid data in patch request</response>
+    [HttpPatch]
+    [ProducesResponseType(typeof(PagePatchDto), StatusCodes.Status200OK)]
+    public async ValueTask<IActionResult> Patch([FromBody] PagePatchCommand command, CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
 

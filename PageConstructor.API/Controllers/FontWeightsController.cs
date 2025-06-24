@@ -10,6 +10,7 @@ namespace PageConstructor.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class FontWeightsController(IMediator mediator) : ControllerBase
 {
     /// <summary>
@@ -82,6 +83,23 @@ public class FontWeightsController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(FontWeightDto), StatusCodes.Status200OK)]
     public async ValueTask<IActionResult> Update([FromBody] FontWeightUpdateCommand command, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Partially updates an existing fontWeight.
+    /// </summary>
+    /// <param name="command">The patch command containing updated fields.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated FontWeight data.</returns>
+    /// <response code="200">FontWeight patched successfully</response>
+    /// <response code="400">Invalid data in patch request</response>
+    [HttpPatch]
+    [ProducesResponseType(typeof(FontWeightPatchDto), StatusCodes.Status200OK)]
+    public async ValueTask<IActionResult> Patch([FromBody] FontWeightPatchCommand command, CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
 

@@ -40,6 +40,11 @@ public interface IPageService
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default);
 
+    ValueTask<Page> PatchAsync(
+        PagePatchDto patchDto,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default);
+
     ValueTask<Page?> DeleteAsync(
         Page page,
         CommandOptions commandOptions = default,

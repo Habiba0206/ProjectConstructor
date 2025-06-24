@@ -40,6 +40,11 @@ public interface IFontWeightService
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default);
 
+    ValueTask<FontWeight> PatchAsync(
+        FontWeightPatchDto patchDto,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default);
+
     ValueTask<FontWeight?> DeleteAsync(
         FontWeight fontWeight,
         CommandOptions commandOptions = default,

@@ -9,5 +9,6 @@ public class ScriptMapper : Profile
     public ScriptMapper()
     {
         CreateMap<Script, ScriptDto>().ReverseMap();
+        CreateMap<Script, ScriptPatchDto>().ReverseMap();
     }
 }

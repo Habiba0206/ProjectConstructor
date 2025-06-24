@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using PageConstructor.Infrastructure.Scripts.Validators;
 using PageConstructor.Persistence.Repositories.Interfaces;
 using PageConstructor.Domain.Entities;
@@ -8,7 +7,7 @@ using PageConstructor.Application.Scripts.Models;
 using PageConstructor.Persistence.Extensions;
 using PageConstructor.Domain.Common.Commands;
 using PageConstructor.Application.Scripts.Services;
-using PageConstructor.Domain.Enums;
+using PageConstructor.Domain.Common.Exceptions;
 
 namespace PageConstructor.Infrastructure.Scripts.Services;
 
@@ -57,7 +56,7 @@ public class ScriptService(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var existingScript = await scriptRepository.GetByIdAsync(script.Id) ?? throw new ArgumentNullException("This book doesn't exist");
+        var existingScript = await scriptRepository.GetByIdAsync(script.Id) ?? throw new NotFoundException(typeof(Script).Name, script.Id);
 
         existingScript.Type = script.Type;
         existingScript.Src = script.Src;
@@ -68,6 +67,24 @@ public class ScriptService(
 
         return await scriptRepository.UpdateAsync(existingScript, commandOptions, cancellationToken);
     }
+
+    public async ValueTask<Script> PatchAsync(
+        ScriptPatchDto patchDto, 
+        CommandOptions commandOptions = default, 
+        CancellationToken cancellationToken = default)
+{
+    var existing = await scriptRepository.GetByIdAsync(patchDto.Id, cancellationToken: cancellationToken)
+                  ?? throw new NotFoundException(typeof(Script).Name, patchDto.Id);
+
+    if (patchDto.Type is not null) existing.Type = patchDto.Type;
+    if (patchDto.Src is not null) existing.Src = patchDto.Src;
+    if (patchDto.Lang is not null) existing.Lang = patchDto.Lang;
+    if (patchDto.Modules.HasValue) existing.Modules = patchDto.Modules.Value;
+    if (patchDto.Async.HasValue) existing.Async = patchDto.Async.Value;
+    if (patchDto.PageId.HasValue) existing.PageId = patchDto.PageId.Value;
+
+    return await scriptRepository.UpdateAsync(existing, cancellationToken: cancellationToken);
+}
 
     public ValueTask<Script?> DeleteAsync(
         Script script,

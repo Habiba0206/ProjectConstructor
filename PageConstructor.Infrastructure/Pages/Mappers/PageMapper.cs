@@ -9,5 +9,6 @@ public class PageMapper : Profile
     public PageMapper()
     {
         CreateMap<Page, PageDto>().ReverseMap();
+        CreateMap<Page, PagePatchDto>().ReverseMap();
     }
 }

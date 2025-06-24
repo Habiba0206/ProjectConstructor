@@ -40,6 +40,11 @@ public interface IFontService
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default);
 
+    ValueTask<Font> PatchAsync(
+        FontPatchDto patchDto,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default);
+
     ValueTask<Font?> DeleteAsync(
         Font book,
         CommandOptions commandOptions = default,

@@ -29,6 +29,8 @@ using Microsoft.OpenApi.Models;
 using PageConstructor.API.Middlewares;
 using MediatR;
 using PageConstructor.API.Behaviours;
+using PageConstructor.Application.Projects.Services;
+using PageConstructor.Infrastructure.Projects.Services;
 
 namespace PageConstructor.API.Configurations;
 
@@ -131,6 +133,7 @@ public static partial class HostConfiguration
             .AddScoped<IFontWeightRepository, FontWeightRepository>()
             .AddScoped<IMetaRepository, MetaRepository>()
             .AddScoped<IPageRepository, PageRepository>()
+            .AddScoped<IProjectRepository, ProjectRepository>()
             .AddScoped<IScriptRepository, ScriptRepository>();
 
         //registering services
@@ -140,6 +143,7 @@ public static partial class HostConfiguration
             .AddScoped<IFontWeightService, FontWeightService>()
             .AddScoped<IMetaService, MetaService>()
             .AddScoped<IPageService, PageService>()
+            .AddScoped<IProjectService, ProjectService>()
             .AddScoped<IScriptService, ScriptService>();
 
         return builder;

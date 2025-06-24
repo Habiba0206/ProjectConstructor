@@ -41,6 +41,11 @@ public interface IScriptService
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default);
 
+    ValueTask<Script> PatchAsync(
+        ScriptPatchDto patchDto,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default);
+
     ValueTask<Script?> DeleteAsync(
         Script script,
         CommandOptions commandOptions = default,

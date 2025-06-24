@@ -42,6 +42,11 @@ public interface IMetaService
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default);
 
+    ValueTask<Meta> PatchAsync(
+        MetaPatchDto patchDto,
+        CommandOptions commandOptions = default,
+        CancellationToken cancellationToken = default);
+
     ValueTask<Meta?> DeleteAsync(
         Meta meta,
         CommandOptions commandOptions = default,

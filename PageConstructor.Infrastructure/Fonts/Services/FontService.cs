@@ -3,12 +3,11 @@ using PageConstructor.Application.Fonts.Services;
 using PageConstructor.Domain.Common.Commands;
 using PageConstructor.Domain.Common.Queries;
 using PageConstructor.Domain.Entities;
-using PageConstructor.Domain.Enums;
 using PageConstructor.Persistence.Extensions;
 using PageConstructor.Persistence.Repositories.Interfaces;
-using FluentValidation;
 using System.Linq.Expressions;
 using PageConstructor.Infrastructure.Fonts.Validators;
+using PageConstructor.Domain.Common.Exceptions;
 
 namespace PageConstructor.Infrastructure.Fonts.Services;
 
@@ -57,7 +56,7 @@ public class FontService(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var existingFont = await fontRepository.GetByIdAsync(font.Id) ?? throw new ArgumentNullException("This book doesn't exist");
+        var existingFont = await fontRepository.GetByIdAsync(font.Id) ?? throw new NotFoundException(typeof(Font).Name, font.Id);
 
         existingFont.Name = font.Name;
         existingFont.Src = font.Src;
@@ -65,6 +64,22 @@ public class FontService(
         existingFont.PageId = font.PageId;
 
         return await fontRepository.UpdateAsync(existingFont, commandOptions, cancellationToken);
+    }
+
+    public async ValueTask<Font> PatchAsync(
+        FontPatchDto patchDto,
+        CommandOptions commandOptions = default, 
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await fontRepository.GetByIdAsync(patchDto.Id, cancellationToken: cancellationToken)
+                      ?? throw new NotFoundException(typeof(Font).Name, patchDto.Id);
+
+        if (patchDto.Name is not null) existing.Name = patchDto.Name;
+        if (patchDto.Src is not null) existing.Src = patchDto.Src;
+        if (patchDto.Display is not null) existing.Display = patchDto.Display;
+        if (patchDto.PageId.HasValue) existing.PageId = patchDto.PageId.Value;
+
+        return await fontRepository.UpdateAsync(existing, commandOptions, cancellationToken);
     }
 
     public ValueTask<Font?> DeleteAsync(

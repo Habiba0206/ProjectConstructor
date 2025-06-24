@@ -9,6 +9,8 @@ using PageConstructor.Persistence.Extensions;
 using PageConstructor.Domain.Entities;
 using PageConstructor.Domain.Common.Commands;
 using PageConstructor.Domain.Enums;
+using PageConstructor.Domain.Common.Exceptions;
+using System.Dynamic;
 
 namespace PageConstructor.Infrastructure.Pages.Services;
 
@@ -56,14 +58,34 @@ public class PageService(
         CommandOptions commandOptions = default,
         CancellationToken cancellationToken = default)
     {
-        var existingPage = await pageRepository.GetByIdAsync(page.Id) ?? throw new ArgumentNullException("This book doesn't exist");
+        var existingPage = await pageRepository.GetByIdAsync(page.Id) ?? throw new NotFoundException(typeof(Page).Name, page.Id);
 
         existingPage.ProjectId = page.ProjectId;
         existingPage.Title = page.Title;
+        existingPage.UrlPath = page.UrlPath;
         existingPage.Css = page.Css; 
         existingPage.IsPublished = page.IsPublished;
+        existingPage.LastSaved = page.LastSaved;
 
         return await pageRepository.UpdateAsync(existingPage, commandOptions, cancellationToken);
+    }
+
+    public async ValueTask<Page> PatchAsync(
+        PagePatchDto patchDto, 
+        CommandOptions commandOptions = default, 
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await pageRepository.GetByIdAsync(patchDto.Id, cancellationToken: cancellationToken)
+                      ?? throw new NotFoundException(typeof(Page).Name, patchDto.Id);
+
+        if (patchDto.ProjectId.HasValue) existing.ProjectId = patchDto.ProjectId.Value;
+        if (patchDto.Title is not null) existing.Title = patchDto.Title;
+        if (patchDto.UrlPath is not null) existing.UrlPath = patchDto.UrlPath;
+        if (patchDto.Css is not null) existing.Css = patchDto.Css;
+        if (patchDto.IsPublished.HasValue) existing.IsPublished = patchDto.IsPublished.Value;
+        if (patchDto.LastSaved.HasValue) existing.LastSaved = patchDto.LastSaved.Value;
+
+        return await pageRepository.UpdateAsync(existing, cancellationToken: cancellationToken);
     }
 
     public ValueTask<Page?> DeleteAsync(

@@ -160,19 +160,58 @@ namespace PageConstructor.Persistence.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTimeOffset>("LastSaved")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset?>("ModifiedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("SectionsJson")
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UrlPath")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProjectId");
+
                     b.ToTable("Pages");
+                });
+
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Project", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("ModifiedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("PageConstructor.Domain.Entities.Script", b =>
@@ -254,6 +293,17 @@ namespace PageConstructor.Persistence.Migrations
                     b.Navigation("Page");
                 });
 
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Page", b =>
+                {
+                    b.HasOne("PageConstructor.Domain.Entities.Project", "Project")
+                        .WithMany("Pages")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("PageConstructor.Domain.Entities.Script", b =>
                 {
                     b.HasOne("PageConstructor.Domain.Entities.Page", "Page")
@@ -277,6 +327,11 @@ namespace PageConstructor.Persistence.Migrations
                     b.Navigation("Metas");
 
                     b.Navigation("Scripts");
+                });
+
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Project", b =>
+                {
+                    b.Navigation("Pages");
                 });
 #pragma warning restore 612, 618
         }

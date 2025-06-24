@@ -9,5 +9,6 @@ public class MetaMapper : Profile
     public MetaMapper()
     {
         CreateMap<Meta, MetaDto>().ReverseMap();
+        CreateMap<Meta, MetaPatchDto>().ReverseMap();
     }
 }

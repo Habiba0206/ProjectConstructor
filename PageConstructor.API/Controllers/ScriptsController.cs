@@ -6,11 +6,14 @@ using PageConstructor.API.Common;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Application.Scripts.Models;
 using PageConstructor.Application.Pages.Models;
+using PageConstructor.Application.Metas.Commands;
+using PageConstructor.Application.Metas.Models;
 
 namespace PageConstructor.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class ScriptsController(IMediator mediator) : ControllerBase
 {
     /// <summary>
@@ -83,6 +86,23 @@ public class ScriptsController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(ScriptDto), StatusCodes.Status200OK)]
     public async ValueTask<IActionResult> Update([FromBody] ScriptUpdateCommand command, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Partially updates an existing script.
+    /// </summary>
+    /// <param name="command">The patch command containing updated fields.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated Script data.</returns>
+    /// <response code="200">Script patched successfully</response>
+    /// <response code="400">Invalid data in patch request</response>
+    [HttpPatch]
+    [ProducesResponseType(typeof(ScriptPatchDto), StatusCodes.Status200OK)]
+    public async ValueTask<IActionResult> Patch([FromBody] ScriptPatchCommand command, CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
 

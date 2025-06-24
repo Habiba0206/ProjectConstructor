@@ -6,11 +6,13 @@ using PageConstructor.API.Common;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Application.Metas.Models;
 using PageConstructor.Application.Pages.Models;
+using PageConstructor.Application.Fonts.Commands;
 
 namespace PageConstructor.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class MetasController(IMediator mediator) : ControllerBase
 {
     /// <summary>
@@ -83,6 +85,23 @@ public class MetasController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(MetaDto), StatusCodes.Status200OK)]
     public async ValueTask<IActionResult> Update([FromBody] MetaUpdateCommand command, CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Partially updates an existing meta.
+    /// </summary>
+    /// <param name="command">The patch command containing updated fields.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated Meta data.</returns>
+    /// <response code="200">Meta patched successfully</response>
+    /// <response code="400">Invalid data in patch request</response>
+    [HttpPatch]
+    [ProducesResponseType(typeof(MetaPatchDto), StatusCodes.Status200OK)]
+    public async ValueTask<IActionResult> Patch([FromBody] MetaPatchCommand command, CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
 
