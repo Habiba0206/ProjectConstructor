@@ -31,6 +31,8 @@ using MediatR;
 using PageConstructor.API.Behaviours;
 using PageConstructor.Application.Projects.Services;
 using PageConstructor.Infrastructure.Projects.Services;
+using PageConstructor.Application.Blocks.Services;
+using PageConstructor.Infrastructure.Blocks.Services;
 
 namespace PageConstructor.API.Configurations;
 
@@ -129,6 +131,7 @@ public static partial class HostConfiguration
         //registering repositories
         builder
             .Services
+            .AddScoped<IBlockRepository, BlockRepository>()
             .AddScoped<IFontRepository, FontRepository>()
             .AddScoped<IFontWeightRepository, FontWeightRepository>()
             .AddScoped<IMetaRepository, MetaRepository>()
@@ -139,12 +142,16 @@ public static partial class HostConfiguration
         //registering services
         builder
             .Services
+            .AddScoped<IBlockService, BlockService>()
             .AddScoped<IFontService, FontService>()
             .AddScoped<IFontWeightService, FontWeightService>()
             .AddScoped<IMetaService, MetaService>()
             .AddScoped<IPageService, PageService>()
             .AddScoped<IProjectService, ProjectService>()
             .AddScoped<IScriptService, ScriptService>();
+
+        //registering google fonts service
+        builder.Services.AddHttpClient<IGoogleFontsService, GoogleFontsService>();
 
         return builder;
     }

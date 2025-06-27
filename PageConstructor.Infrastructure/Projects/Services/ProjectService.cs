@@ -1,6 +1,4 @@
-﻿using PageConstructor.Application.Pages.Models;
-using PageConstructor.Application.Pages.Services;
-using PageConstructor.Application.Projects.Models;
+﻿using PageConstructor.Application.Projects.Models;
 using PageConstructor.Application.Projects.Services;
 using PageConstructor.Domain.Common.Commands;
 using PageConstructor.Domain.Common.Exceptions;
@@ -58,7 +56,9 @@ public class ProjectService(
     {
         var existingProject = await projectRepository.GetByIdAsync(project.Id) ?? throw new NotFoundException(typeof(Project).Name, project.Id);
 
-        existingProject.Name = project.Name;;
+        existingProject.Name = project.Name;
+        existingProject.UrlPath = project.UrlPath;
+        existingProject.GlobalStyles = project.GlobalStyles;
 
         return await projectRepository.UpdateAsync(existingProject, commandOptions, cancellationToken);
     }
@@ -72,6 +72,8 @@ public class ProjectService(
                       ?? throw new NotFoundException(typeof(Project).Name, patchDto.Id);
 
         if (patchDto.Name is not null) existing.Name = patchDto.Name;
+        if (patchDto.UrlPath is not null) existing.UrlPath = patchDto.UrlPath;
+        if (patchDto.GlobalStyles is not null) existing.GlobalStyles = patchDto.GlobalStyles;
 
         return await projectRepository.UpdateAsync(existing, cancellationToken: cancellationToken);
     }

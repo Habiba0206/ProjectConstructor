@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using PageConstructor.Application.Pages.Commands;
-using PageConstructor.Application.Pages.Models;
-using PageConstructor.Application.Pages.Services;
 using PageConstructor.Application.Projects.Commands;
 using PageConstructor.Application.Projects.Models;
 using PageConstructor.Application.Projects.Services;

@@ -63,6 +63,17 @@ public class ExceptionHandlingMiddleware
             });
         }
 
+        catch (EntityExistsException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                Error = "This entity exists",
+                Details = new List<string> { ex.InnerException?.Message ?? ex.Message }
+            });
+        }
+
         //catch (Exception ex)
         //{
         //    _logger.LogError(ex, "Unhandled exception occurred");

@@ -11,4 +11,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbC
     public DbSet<FontWeight> FontWeights => Set<FontWeight>();
     public DbSet<Meta> Metas => Set<Meta>();
     public DbSet<Script> Scripts => Set<Script>();
+    public DbSet<Block> Blocks => Set<Block>();
 }

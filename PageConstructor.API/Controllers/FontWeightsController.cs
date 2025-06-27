@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PageConstructor.API.Common;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Application.Pages.Models;
+using PageConstructor.Application.Fonts.Services;
 
 namespace PageConstructor.API.Controllers;
 
@@ -118,5 +119,32 @@ public class FontWeightsController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new FontWeightDeleteByIdCommand { FontWeightId = fontWeightId }, cancellationToken);
 
         return result ? Ok() : BadRequest();
+    }
+
+    /// <summary>
+    /// Retrieves available font weights for a specific Google Font family.
+    /// Example: /api/fonts/google/weights?family=Roboto
+    /// </summary>
+    [HttpGet("google")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async ValueTask<IActionResult> GetFontWeights(
+        [FromServices] IGoogleFontsService googleService,
+        [FromQuery] string family,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(family))
+            return BadRequest(new { Error = "Font family is required." });
+
+        var weights = await googleService.GetFontWeightsAsync(family, cancellationToken);
+
+        if (weights == null || weights.Count == 0)
+            return NotFound(new { Error = $"Font '{family}' not found or has no weight variants." });
+
+        return Ok(new
+        {
+            font = family,
+            weights
+        });
     }
 }

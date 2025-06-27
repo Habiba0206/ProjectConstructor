@@ -6,6 +6,11 @@ using PageConstructor.API.Common;
 using PageConstructor.Application.Fonts.Models;
 using PageConstructor.Application.Pages.Models;
 using PageConstructor.Application.Pages.Commands;
+using PageConstructor.Infrastructure.Fonts.Services;
+using PageConstructor.Application.Fonts.Services;
+using System.ComponentModel.DataAnnotations;
+using PageConstructor.Domain.Common.Queries;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace PageConstructor.API.Controllers;
 
@@ -119,5 +124,40 @@ public class FontsController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new FontDeleteByIdCommand { FontId = fontId }, cancellationToken);
 
         return result ? Ok() : BadRequest();
+    }
+
+    /// <summary>
+    /// Retrieves Google Fonts with optional filters.
+    /// Search.
+    /// Family: exact font family (e.g., "Roboto").
+    /// Subset: character subset ("latin", "cyrillic").
+    /// Sort: alpha, date, popularity, style, trending.
+    /// Category: serif, sans-serif, monospace, display, handwriting.
+    /// Capability: woff2, vf.
+    /// </summary>
+    [HttpGet("google")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async ValueTask<IActionResult> GetGoogleFonts(
+        [FromServices] IGoogleFontsService googleService,
+        [FromQuery] string? search = null,
+        [FromQuery] string? family = null,
+        [FromQuery] string? subset = null,
+        [FromQuery, RegularExpression("^(alpha|date|popularity|style|trending)$")] string? sort = null,
+        [FromQuery, RegularExpression("^(serif|sans-serif|monospace|display|handwriting)$")] string? category = null,
+        [FromQuery, RegularExpression("^(woff2|vf)$")] string? capability = null,
+        [FromQuery] FilterPagination? pagination = null,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var json = await googleService.GetWebFontsJsonAsync(
+                family, search, subset, sort, category, capability, pagination, cancellationToken);
+            return Content(json, "application/json");
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 }

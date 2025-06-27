@@ -122,4 +122,3 @@ public class ProjectsController(IMediator mediator) : ControllerBase
         return result ? Ok() : BadRequest();
     }
 }
-

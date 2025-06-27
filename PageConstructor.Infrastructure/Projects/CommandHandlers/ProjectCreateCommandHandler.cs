@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using PageConstructor.Application.Projects.Commands;
 using PageConstructor.Application.Projects.Models;
 using PageConstructor.Application.Projects.Services;
 using PageConstructor.Domain.Common.Commands;
+using PageConstructor.Domain.Common.Exceptions;
 using PageConstructor.Domain.Entities;
 using PageConstructor.Domain.Enums;
 using PageConstructor.Infrastructure.Projects.Validators;
@@ -26,6 +28,10 @@ public class ProjectCreateCommandHandler(
 
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
+
+        var existingProject = await projectService.Get(p => p.Name == request.ProjectDto.Name).FirstOrDefaultAsync();
+
+        if (existingProject is not null) throw new EntityExistsException(typeof(Project).Name, existingProject.Name);
 
         var project = mapper.Map<Project>(request.ProjectDto);
 

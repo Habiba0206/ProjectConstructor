@@ -22,11 +22,11 @@ public class FontService(
     fontRepository.Get(predicate, queryOptions);
 
     public IQueryable<Font> Get(
-        FontFilter answerFilter,
+        FontFilter fontFilter,
         QueryOptions queryOptions = default) =>
     fontRepository
         .Get(queryOptions: queryOptions)
-        .ApplyPagination(answerFilter);
+        .ApplyPagination(fontFilter);
 
     public ValueTask<Font?> GetByIdAsync(
         Guid id,

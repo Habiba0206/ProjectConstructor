@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using PageConstructor.Application.Pages.Commands;
 using PageConstructor.Application.Projects.Commands;
-using PageConstructor.Infrastructure.Pages.Validators;
 
 namespace PageConstructor.Infrastructure.Projects.Validators;
 
