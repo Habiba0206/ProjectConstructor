@@ -63,6 +63,7 @@ public class PageService(
         existingPage.ProjectId = page.ProjectId;
         existingPage.Title = page.Title;
         existingPage.UrlPath = page.UrlPath;
+        existingPage.Html = page.Html;
         existingPage.Css = page.Css; 
         existingPage.IsPublished = page.IsPublished;
         existingPage.LastSaved = page.LastSaved;
@@ -81,6 +82,7 @@ public class PageService(
         if (patchDto.ProjectId.HasValue) existing.ProjectId = patchDto.ProjectId.Value;
         if (patchDto.Title is not null) existing.Title = patchDto.Title;
         if (patchDto.UrlPath is not null) existing.UrlPath = patchDto.UrlPath;
+        if (patchDto.Html is not null) existing.Html = patchDto.Html;
         if (patchDto.Css is not null) existing.Css = patchDto.Css;
         if (patchDto.IsPublished.HasValue) existing.IsPublished = patchDto.IsPublished.Value;
         if (patchDto.LastSaved.HasValue) existing.LastSaved = patchDto.LastSaved.Value;

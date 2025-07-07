@@ -4,6 +4,7 @@ using PageConstructor.API.Common;
 using PageConstructor.Application.Blocks.Commands;
 using PageConstructor.Application.Blocks.Models;
 using PageConstructor.Application.Blocks.Queries;
+using PageConstructor.Application.Blocks.Services;
 
 namespace PageConstructor.API.Controllers;
 
@@ -117,5 +118,27 @@ public class BlocksController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new BlockDeleteByIdCommand { BlockId = blockId }, cancellationToken);
 
         return result ? Ok() : BadRequest();
+    }
+
+    /// <summary>
+    /// Uploads a preview image for a block and returns the file URL.
+    /// </summary>
+    /// <param name="uploadService">The file upload service (injected).</param>
+    /// <param name="dto">The dto model where there is file to upload.</param>
+    /// <returns>A URL pointing to the uploaded image.</returns>
+    /// <response code="200">File uploaded successfully</response>
+    /// <response code="400">No file was uploaded or file is empty</response>
+    /// <response code="500">An unexpected error occurred while uploading</response>
+    [HttpPost("upload-preview")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async ValueTask<IActionResult> UploadPreview([FromServices]IFileUploadService uploadService, [FromForm] BlockImageUploadDto dto)
+    {
+        if (dto.File == null || dto.File.Length == 0)
+            return BadRequest("No file uploaded.");
+
+        var url = await uploadService.UploadBlockPreviewAsync(dto.File);
+        return Ok(new { url });
     }
 }

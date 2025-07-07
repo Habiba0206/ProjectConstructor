@@ -203,6 +203,10 @@ namespace PageConstructor.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Html")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 

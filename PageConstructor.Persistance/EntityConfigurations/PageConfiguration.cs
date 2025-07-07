@@ -12,6 +12,7 @@ public class PageConfiguration : IEntityTypeConfiguration<Page>
         
         builder.Property(p => p.Title).IsRequired().HasMaxLength(255);
         builder.Property(p => p.UrlPath).IsRequired();
+        builder.Property(p => p.Html).IsRequired();
         builder.Property(p => p.Css).HasColumnType("text");
         builder.Property(p => p.SectionsJson).HasColumnType("jsonb");
 

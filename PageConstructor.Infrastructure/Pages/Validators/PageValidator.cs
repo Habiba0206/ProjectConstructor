@@ -14,6 +14,9 @@ public class PageValidator : AbstractValidator<PageDto>
         RuleFor(page => page.UrlPath)
             .NotEmpty().WithMessage("Url Path can't be empty");
 
+        RuleFor(page => page.Html)
+            .NotEmpty().WithMessage("Html can't be empty");
+
         RuleFor(page => page.ProjectId)
             .NotNull().WithMessage("Project ID must not be null.")
             .NotEqual(Guid.Empty).WithMessage("Project ID must not be empty.");

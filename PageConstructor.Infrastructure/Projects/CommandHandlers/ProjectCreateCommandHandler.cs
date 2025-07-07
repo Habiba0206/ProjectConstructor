@@ -29,7 +29,7 @@ public class ProjectCreateCommandHandler(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var existingProject = await projectService.Get(p => p.Name == request.ProjectDto.Name).FirstOrDefaultAsync();
+        var existingProject = await projectService.Get(p => p.Name == request.ProjectDto.Name && !p.IsDeleted).FirstOrDefaultAsync();
 
         if (existingProject is not null) throw new EntityExistsException(typeof(Project).Name, existingProject.Name);
 

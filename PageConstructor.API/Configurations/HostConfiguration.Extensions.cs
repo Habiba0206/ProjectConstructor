@@ -33,6 +33,7 @@ using PageConstructor.Application.Projects.Services;
 using PageConstructor.Infrastructure.Projects.Services;
 using PageConstructor.Application.Blocks.Services;
 using PageConstructor.Infrastructure.Blocks.Services;
+using BookManagement.Api.Data;
 
 namespace PageConstructor.API.Configurations;
 
@@ -128,6 +129,8 @@ public static partial class HostConfiguration
 
     private static WebApplicationBuilder AddInfrastructure(this WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpContextAccessor();
+
         //registering repositories
         builder
             .Services
@@ -148,8 +151,8 @@ public static partial class HostConfiguration
             .AddScoped<IMetaService, MetaService>()
             .AddScoped<IPageService, PageService>()
             .AddScoped<IProjectService, ProjectService>()
-            .AddScoped<IScriptService, ScriptService>();
-
+            .AddScoped<IScriptService, ScriptService>()
+            .AddScoped<IFileUploadService, FileUploadService>();
         //registering google fonts service
         builder.Services.AddHttpClient<IGoogleFontsService, GoogleFontsService>();
 
@@ -185,6 +188,14 @@ public static partial class HostConfiguration
         );
 
         return builder;
+    }
+
+    private static async ValueTask<WebApplication> SeedDataAsync(this WebApplication app)
+    {
+        var serviceScope = app.Services.CreateScope();
+        await serviceScope.ServiceProvider.InitializeSeedAsync();
+
+        return app;
     }
 
     private static WebApplicationBuilder AddDevTools(this WebApplicationBuilder builder)
@@ -228,6 +239,7 @@ public static partial class HostConfiguration
 
     private static WebApplication UseDevTools(this WebApplication app)
     {
+        app.UseStaticFiles();
         app.UseMiddleware<ExceptionHandlingMiddleware>();
         app.UseSwagger();
         app.UseSwaggerUI();
