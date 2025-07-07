@@ -1,4 +1,6 @@
-﻿namespace PageConstructor.Application.Blocks.Models;
+﻿using PageConstructor.Application.Components.Models;
+
+namespace PageConstructor.Application.Blocks.Models;
 
 public class BlockDto
 {
@@ -43,4 +45,5 @@ public class BlockDto
     /// Optional preview image URL for visual block representation
     /// </summary>
     public string? PreviewImageUrl { get; set; }
+    public List<ComponentDto> Components { get; set; }
 }

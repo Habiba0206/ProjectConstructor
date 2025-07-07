@@ -4,7 +4,7 @@ using PageConstructor.API.Common;
 using PageConstructor.Application.Blocks.Commands;
 using PageConstructor.Application.Blocks.Models;
 using PageConstructor.Application.Blocks.Queries;
-using PageConstructor.Application.Blocks.Services;
+using PageConstructor.Application.Common.Services;
 
 namespace PageConstructor.API.Controllers;
 

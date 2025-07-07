@@ -34,6 +34,10 @@ using PageConstructor.Infrastructure.Projects.Services;
 using PageConstructor.Application.Blocks.Services;
 using PageConstructor.Infrastructure.Blocks.Services;
 using BookManagement.Api.Data;
+using PageConstructor.Application.Common.Services;
+using PageConstructor.Infrastructure.Common.Services;
+using PageConstructor.Application.Components.Services;
+using PageConstructor.Infrastructure.Components.Services;
 
 namespace PageConstructor.API.Configurations;
 
@@ -135,6 +139,7 @@ public static partial class HostConfiguration
         builder
             .Services
             .AddScoped<IBlockRepository, BlockRepository>()
+            .AddScoped<IComponentRepository, ComponentRepository>()
             .AddScoped<IFontRepository, FontRepository>()
             .AddScoped<IFontWeightRepository, FontWeightRepository>()
             .AddScoped<IMetaRepository, MetaRepository>()
@@ -146,6 +151,7 @@ public static partial class HostConfiguration
         builder
             .Services
             .AddScoped<IBlockService, BlockService>()
+            .AddScoped<IComponentService, ComponentService>()
             .AddScoped<IFontService, FontService>()
             .AddScoped<IFontWeightService, FontWeightService>()
             .AddScoped<IMetaService, MetaService>()

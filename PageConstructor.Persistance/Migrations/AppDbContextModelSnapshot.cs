@@ -71,6 +71,50 @@ namespace PageConstructor.Persistence.Migrations
                     b.ToTable("Blocks");
                 });
 
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Component", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BlockId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Css")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HtmlContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("ModifiedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PreviewImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlockId");
+
+                    b.ToTable("Components");
+                });
+
             modelBuilder.Entity("PageConstructor.Domain.Entities.Font", b =>
                 {
                     b.Property<Guid>("Id")
@@ -320,6 +364,17 @@ namespace PageConstructor.Persistence.Migrations
                     b.ToTable("Scripts");
                 });
 
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Component", b =>
+                {
+                    b.HasOne("PageConstructor.Domain.Entities.Block", "Block")
+                        .WithMany("Components")
+                        .HasForeignKey("BlockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Block");
+                });
+
             modelBuilder.Entity("PageConstructor.Domain.Entities.Font", b =>
                 {
                     b.HasOne("PageConstructor.Domain.Entities.Page", "Page")
@@ -373,6 +428,11 @@ namespace PageConstructor.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Page");
+                });
+
+            modelBuilder.Entity("PageConstructor.Domain.Entities.Block", b =>
+                {
+                    b.Navigation("Components");
                 });
 
             modelBuilder.Entity("PageConstructor.Domain.Entities.Font", b =>

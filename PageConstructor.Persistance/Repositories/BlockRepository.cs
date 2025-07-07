@@ -1,4 +1,5 @@
-﻿using PageConstructor.Domain.Common.Commands;
+﻿using Microsoft.EntityFrameworkCore;
+using PageConstructor.Domain.Common.Commands;
 using PageConstructor.Domain.Common.Queries;
 using PageConstructor.Domain.Entities;
 using PageConstructor.Persistence.Caching.Brokers;
@@ -17,7 +18,8 @@ public class BlockRepository(AppDbContext appDbContext, ICacheBroker cacheBroker
         Expression<Func<Block, bool>>? predicate = null,
         QueryOptions queryOptions = default)
     {
-        var blocks = base.Get(predicate, queryOptions);
+        var blocks = base.Get(predicate, queryOptions)
+            .Include(b => b.Components).Where(c => !c.IsDeleted);
 
         return blocks;
     }

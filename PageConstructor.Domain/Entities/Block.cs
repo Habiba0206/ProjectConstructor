@@ -43,4 +43,6 @@ public class Block : AuditableEntity
     /// Optional preview image URL for visual block representation
     /// </summary>
     public string? PreviewImageUrl { get; set; }
+
+    public List<Component> Components { get; set; }
 }
